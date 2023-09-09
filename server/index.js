@@ -273,6 +273,108 @@ app.get("/accommodation/:id", async (req, res) => {
 app.get("/accommodation", async (req, res) => {
   res.json(await Accommodation.find());
 });
+// Routes that require JWT authentication
+app.post("/booking/add", verifyToken, (req, res) => {
+  const { place, checkIn, checkOut, noofPeople, phoneNo } = req.body;
+  
+  // Extract userId from the req.user object
+  const userId = req.user.userId; // Assuming userId is stored in the JWT payload
+
+  const newBooking = new Booking({
+    place,
+    checkIn,
+    checkOut,
+    noofPeople,
+    phoneNo,
+    userId,
+  });
+
+  newBooking
+    .save()
+    .then(() => {
+      res.status(201).json({ message: "Booking Added" });
+    })
+    .catch((err) => {
+      console.error(err);
+      res
+        .status(500)
+        .json({ message: "Failed to add booking", error: err.message });
+    });
+});
+
+// Update an existing booking
+app.put("/booking/update/:bookingId", verifyToken, async (req, res) => {
+  try {
+    const { place, checkIn, checkOut, noofPeople, phoneNo } = req.body;
+    const bookingId = req.params.bookingId;
+    
+    // Extract userId from the req.user object
+    const userId = req.user.userId; // Assuming userId is stored in the JWT payload
+
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      bookingId,
+      {
+        place,
+        checkIn,
+        checkOut,
+        noofPeople,
+        phoneNo,
+        userId,
+      },
+      { new: true } // To return the updated booking
+    );
+
+    if (!updatedBooking) {
+      return res.status(404).json({ message: "Booking not found." });
+    }
+
+    res.status(200).json({ message: "Booking updated successfully.", booking: updatedBooking });
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while updating the booking." });
+  }
+});
+// Delete an existing booking
+app.delete("/booking/delete/:bookingId", verifyToken, async (req, res) => {
+  try {
+    const bookingId = req.params.bookingId;
+    
+    // Extract userId from the req.user object
+    const userId = req.user.userId; // Assuming userId is stored in the JWT payload
+
+    const deletedBooking = await Booking.findOneAndDelete({
+      _id: bookingId,
+      userId: userId, // Ensure that the booking belongs to the authenticated user
+    });
+
+    if (!deletedBooking) {
+      return res.status(404).json({ message: "Booking not found." });
+    }
+
+    res.status(200).json({ message: "Booking deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while deleting the booking." });
+  }
+});
+// Retrieve bookings for a specific user
+app.get("/booking", verifyToken, async (req, res) => {
+  try {
+    // Extract userId from the req.user object
+    const userId = req.user.userId; // Assuming userId is stored in the JWT payload
+    console.log("UserID:", userId); // Log the userId to see if it's correct
+
+    const bookings = await Booking.find({ userId });
+    console.log("Bookings:", bookings); // Log the retrieved bookings
+
+    if (!bookings) {
+      return res.status(404).json({ message: "No bookings found for this user." });
+    }
+
+    res.status(200).json({ bookings });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ error: "An error occurred while fetching bookings." });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
