@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link,navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 export default function AddBooking() {
   const [place, setPlace] = useState("");
@@ -8,8 +9,15 @@ export default function AddBooking() {
   const [checkOut, setCheckOut] = useState("");
   const [noofPeople, setNoofPeople] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
+  const [token, setToken] = useState(""); // State to store the JWT token
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    // Fetch the JWT token from where it's stored (e.g., localStorage or cookies)
+    const storedToken = localStorage.getItem("userToken");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
 
   function sendData(e) {
     e.preventDefault();
@@ -21,7 +29,12 @@ export default function AddBooking() {
       phoneNo,
     };
 
-    axios.post("http://localhost:4000/booking/add", newBooking)
+    axios
+      .post("/booking/add", newBooking, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         alert("Booking Added");
         // Clear the form fields after successful submission
@@ -35,7 +48,6 @@ export default function AddBooking() {
         alert(err);
       });
   }
-
   return (
     <div className="container">
     <form onSubmit={sendData}>
@@ -112,7 +124,7 @@ export default function AddBooking() {
         type="submit"
         className="bg-secondary_500 text-white font-semibold w-full rounded-md shadow-sm shadow-gray-500 py-2 pl-2 mt-4 text-sm"
         >
-        Submit
+        Create Booking
       </button>
       <Link
             to="/profile"
@@ -138,3 +150,5 @@ export default function AddBooking() {
       </div>
   );
 }
+
+
