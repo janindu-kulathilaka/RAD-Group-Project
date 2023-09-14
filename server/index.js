@@ -16,6 +16,8 @@ const User = require("./models/user");
 const Accommodation = require("./models/accommodation");
 const Service = require("./models/service");
 const Booking=require("./models/bookings");;
+const Review = require("./models/review"); 
+
 
 const jwtSecret = process.env.JWT_SECRET_KEY;
 
@@ -563,6 +565,33 @@ app.get("/booking", verifyToken, async (req, res) => {
     res.status(500).json({ error: "An error occurred while fetching bookings." });
   }
 });
+
+app.post("/reviews", verifyToken, async (req, res) => {
+  try {
+    const { fullName, checkIn, checkOut, description } = req.body;
+
+    // Extract userId from the req.user object
+    const userId = req.user.userId; // Assuming userId is stored in the JWT payload
+
+    // Create a new review document using the Review model
+    const newReview = new Review({
+      fullName,
+      checkIn,
+      checkOut,
+      description,
+      userId, // Associate the review with the user
+    });
+
+    // Save the new review to the database
+    await newReview.save();
+
+    res.status(201).json({ message: "Review added successfully." });
+  } catch (error) {
+    console.error("Error adding review:", error);
+    res.status(500).json({ error: "An error occurred while adding the review." });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
