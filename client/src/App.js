@@ -16,6 +16,7 @@ import ServiceForm from "./components/ServiceForm";
 import GetBooking from "./pages/GetBooking";
 import AddBooking from "./pages/AddBooking";
 import UpdateBooking from "./pages/UpdateBooking";
+import ReviewForm from "./components/ReviewForm";
 
 axios.defaults.baseURL = "http://localhost:4000/";
 
@@ -46,6 +47,7 @@ function App() {
         <Route path="/booking" element={<GetBooking />} />
         <Route path="/booking/add" element={<AddBooking />} /> 
         <Route path="/booking/update" element={<UpdateBooking />} />
+        <Route path="/reviewform" element={<ReviewForm />} />
       </Routes>
     </UserContextProvider>
   );

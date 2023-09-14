@@ -566,31 +566,59 @@ app.get("/booking", verifyToken, async (req, res) => {
   }
 });
 
-app.post("/reviews", verifyToken, async (req, res) => {
-  try {
-    const { fullName, checkIn, checkOut, description } = req.body;
+app.post("/review", async (req, res) => {
+  //try {
+    // const { fullName, checkIn, checkOut, description } = req.body;
 
-    // Extract userId from the req.user object
-    const userId = req.user.userId; // Assuming userId is stored in the JWT payload
+    console.log(req.body);
+    // console.log("Full Name:", fullName);
+    // console.log("Check-In:", checkIn);
+    // console.log("Check-Out:", checkOut);
+    // console.log("Description:", description);
 
     // Create a new review document using the Review model
-    const newReview = new Review({
-      fullName,
-      checkIn,
-      checkOut,
-      description,
-      userId, // Associate the review with the user
-    });
+  //   await Review.create({
+  //     fullName, 
+  //     checkIn,
+  //     checkOut,
+  //     description,
+  //   });
 
-    // Save the new review to the database
-    await newReview.save();
+  //   res.status(201).json({ message: "Review added successfully." });
+  // } catch (error) {
+  //   console.error("Error adding review:", error);
+  //   res.status(500).json({ error: "An error occurred while adding the review." });
+  // }
+}
+);
 
-    res.status(201).json({ message: "Review added successfully." });
-  } catch (error) {
-    console.error("Error adding review:", error);
-    res.status(500).json({ error: "An error occurred while adding the review." });
-  }
-});
+// app.post("/review", async (req, res) => {
+//   try {
+//     const { serviceDetails } = req.body; // Extract user email
+
+//     const email = serviceDetails.email;
+
+//     const user = await User.findOne({ email }); // Find the user by email
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found." });
+//     }
+
+//     await Service.create({
+//       email: user.email,
+//       title: serviceDetails.title,
+//       photos: serviceDetails.addedPhotos,
+//       description: serviceDetails.description,
+//     });
+
+//     res.status(201).json({ message: "Accommodation added successfully." });
+//   } catch (error) {
+//     console.error(error);
+//     res
+//       .status(500)
+//       .json({ error: "An error occurred while adding accommodation." });
+//   }
+// });
 
 
 app.listen(port, () => {
